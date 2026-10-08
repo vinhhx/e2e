@@ -1,0 +1,12 @@
+{
+  "testUser": {
+    "displayName": "Alex River",
+    "emailDomain": "example.org"
+  },
+  "mockPayloads": {
+    "defaultSuccess": {
+      "status": "success",
+      "code": 200
+    }
+  }
+}
