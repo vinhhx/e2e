@@ -1,14 +1,17 @@
 ---
 name: check-new-test
-description: Analyzes an e2e test project under .gsd/projects/<project_name>, inspects code changes/routes, drafts proposed test cases, and gates on human review before generating or updating tests. Use when invoked via /check-new-test or asked to check, plan, or update tests for a project.
+description: Analyzes an e2e test task under .gsd/projects/<project>/<sprint>/<task>/, writes Description.md, Analyze.md, Plan.md, and halts on human review before generating TestCase.md and test code. Use when invoked via /check-new-test or asked to plan a test for a project sprint task.
 ---
 
 # Check New Test (/check-new-test)
 
-This skill implements the **Analyze -> Plan -> Human Review -> Generate** cycle for e2e tests in `.gsd/projects/<project_name>/`.
+This skill implements the Agile **Analyze -> Plan -> Human Review -> Generate** cycle for `.gsd/projects/<project>/<sprint>/<task>/`.
 
 ## Usage
-`/check-new-test <project_name>`
+`/check-new-test <project> [sprint] [task]`
+
+Example:
+`/check-new-test greeting-app sprint-login task-register`
 
 ---
 
@@ -16,27 +19,23 @@ This skill implements the **Analyze -> Plan -> Human Review -> Generate** cycle 
 
 ### 1. Analyze
 1. Read `.gsd/RULES.md` to ensure rules and locator hierarchy are respected.
-2. Read `.gsd/projects/<project_name>/task.md` (if existing) to understand current test coverage.
+2. Locate or create `.gsd/projects/<project>/<sprint>/<task>/`.
 3. Inspect the target application code, recent git diffs, components, and route definitions.
-4. Identify new features, uncovered interactions, form states, and design/layout requirements.
+4. Write `Description.md` (user story & acceptance criteria) and `Analyze.md` (DOM roles, state, and edge cases).
 
 ### 2. Plan
-Formulate proposed test cases in the standard `.gsd` format:
-- **ID & Title:** e.g., `[TC-03] Dynamic Search Filter`
-- **Goal:** User intent.
-- **Preconditions:** Required routes, auth state, or seed data.
-- **Steps:** Sequence of actions.
-- **Functional Expectation:** Specific role/status assertions.
-- **Design Expectation:** Layout alignment, visual prominence (`vision: true`), responsive checks.
+1. Write `Plan.md` defining the execution steps, functional assertions, and visual design checks (`vision: true`).
+2. Initialize `Todo.md` checklist and `Review.md` with status `PENDING_REVIEW`.
 
 ### 3. Human Review Gate (MANDATORY)
-Present the plan clearly to the user using Markdown tables or checklists:
-- **DO NOT** write or modify `.e2e.ts` code yet.
-- Explicitly ask the user to review, adjust, or approve the proposed test plan.
-- Stop and wait for user feedback.
+1. Present the plan clearly to the user in Markdown.
+2. **DO NOT** generate `TestCase.md`, `data.json`, or `*.e2e.ts` code yet.
+3. Explicitly ask the user to review and sign off.
+4. Stop and wait for user confirmation.
 
 ### 4. Generate & Sync (Post-Approval)
 Once the user confirms approval:
-1. Update `.gsd/projects/<project_name>/task.md` with the new approved test cases.
-2. Update or generate `.gsd/projects/<project_name>/<project_name>.e2e.ts`.
-3. Verify that new tests compile and follow `.gsd/RULES.md`.
+1. Write `TestCase.md` and `data.json`.
+2. Generate the runnable `<task>.e2e.ts` script.
+3. Update `Review.md` status to `APPROVED`.
+4. Verify that the new test compiles properly.

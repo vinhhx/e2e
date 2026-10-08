@@ -1,43 +1,44 @@
 ---
 name: e2e-testcase
-description: Executes an individual targeted e2e test case from .gsd/projects/<project_name>/ in the browser interface, verifying both functional logic and visual design. Use when invoked via /e2e-testcase or asked to run a specific test case for a project.
+description: Executes an individual targeted e2e test case from .gsd/projects/<project>/<sprint>/<task>/ in the browser interface, verifying both functional logic and visual design, and updates Review.md. Use when invoked via /e2e-testcase or asked to run a specific test task.
 ---
 
 # E2E Testcase Runner (/e2e-testcase)
 
-This skill executes a specific test case from `.gsd/projects/<project_name>/` against the web browser interface.
+This skill executes a specific test case from `.gsd/projects/<project>/<sprint>/<task>/` against the web browser interface.
 
 ## Usage
-`/e2e-testcase <project_name> <case_name>`
+`/e2e-testcase <project> <sprint> <task>`
 
 Example:
-`/e2e-testcase greeting-app TC-01`
+`/e2e-testcase greeting-app sprint-greeting task-greet-valid`
 
 ---
 
 ## Workflow Steps
 
 ### 1. Load Context & Spec
-1. Read `.gsd/projects/<project_name>/task.md` to find the exact specification for `<case_name>`.
-2. Locate the corresponding test definition in `.gsd/projects/<project_name>/<project_name>.e2e.ts`.
-3. Check for any required session or preconditions declared in `task.md`.
+1. Read `.gsd/projects/<project>/<sprint>/<task>/TestCase.md` and `Plan.md`.
+2. Locate the corresponding test script `.gsd/projects/<project>/<sprint>/<task>/*.e2e.ts`.
+3. Check for any required session or preconditions.
 
 ### 2. Execute Targeted Test
-Run the test in isolation against the browser using the test filter flag `-t`:
+Run the test in isolation against the browser:
 
 ```bash
-pnpm exec e2e run .gsd/projects/<project_name>/*.e2e.ts -t "<case_name>" --headed
+pnpm exec e2e run .gsd/projects/<project>/<sprint>/<task>/*.e2e.ts --headed
 ```
 
 Options:
 - `--headed`: Displays the browser window during test execution.
 - `--ai-trace`: Enables token & model inspection if agent steps run.
-- `--no-cache`: Forces a fresh execution without replaying cached runs when verifying fresh behavior.
+- `--no-cache`: Forces a fresh execution without replaying cached runs.
 
-### 3. Report Results
-1. Check the execution verdict: `passed`, `failed`, or `blocked`.
-2. Locate any screenshots captured in `.e2e/artifacts/`.
-3. Summarize the outcome:
-   - **Functional Result:** Status of DOM/interaction assertions.
-   - **Design Result:** Status of visual assertions (`vision: true`) and layout fidelity.
-   - **Artifacts:** Paths to captured screenshots or failure logs.
+### 3. Log Verdict & Report
+1. Check execution status: `passed`, `failed`, or `blocked`.
+2. Update `.gsd/projects/<project>/<sprint>/<task>/Review.md` with:
+   - Run date and timestamp.
+   - Functional verdict and visual design verdict.
+   - Screenshot artifact paths.
+3. Update `.gsd/projects/<project>/<sprint>/<task>/Todo.md` checking off execution items.
+4. Summarize the outcome in chat with clickable links to artifacts.

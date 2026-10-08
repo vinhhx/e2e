@@ -1,0 +1,7 @@
+{
+  "testUser": {
+    "name": "Jane Doe",
+    "email": "jane@example.org"
+  },
+  "mockPayloads": {}
+}

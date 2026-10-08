@@ -28,7 +28,7 @@ Never use fragile CSS selectors or XPaths. Always resolve nodes according to thi
 ---
 
 ## 3. Test Isolation & State Management
-1. **Self-Contained Test Cases**: Every test case (`TC-xx`) must be independently runnable via `/e2e-testcase <project> <case_name>` without depending on preceding tests.
+1. **Self-Contained Task Test Cases**: Every task test case must be independently runnable via `/e2e-testcase <project> <sprint> <task>` without depending on preceding tests.
 2. **Session Reuse**: For tests requiring authentication, use `test.setup` with `session.save(name)` and declare `{ session: name }` in test options rather than logging in on every test attempt.
 3. **Run-Safe Parameters**:
    - Use `unique(value)` for timestamped or run-specific data (e.g. emails, unique names) so the replay cache does not collide.
@@ -36,20 +36,35 @@ Never use fragile CSS selectors or XPaths. Always resolve nodes according to thi
 
 ---
 
-## 4. Test Case Specification Standard
-Every project under `.gsd/projects/<project_name>/` must maintain a `task.md` with structured test case definitions:
+## 4. Agile Sprint & Task Hierarchy (`Project -> Sprint -> Task`)
+Every project in `.gsd/projects/` is organized into Sprints, where each Task represents an isolated, documented test case:
 
-```markdown
-### [TC-XX] <Title>
-- **Goal:** Clear description of user action.
-- **Preconditions:** Required app state, authenticated session, or initial route.
-- **Execution Steps:** Step-by-step user interaction.
-- **Functional Expectation:** Specific DOM/state assertions (roles, texts, URLs).
-- **Design Expectation:** Layout alignment, responsive viewport checks, styling alerts.
+```text
+.gsd/projects/<project-name>/
+└── <sprint-name>/
+    └── <task-name>/
+        ├── Description.md   # User story, feature overview & acceptance criteria
+        ├── Analyze.md       # Pre-implementation DOM, dependencies & failure mode analysis
+        ├── Plan.md          # Execution plan & step-by-step strategy
+        ├── Todo.md          # Task lifecycle progress checklist
+        ├── Review.md        # Human review gate approval & execution verdicts
+        ├── TestCase.md      # Formal test case specification (TC-xx)
+        ├── data.json        # Dynamic parameters, test accounts & mock payloads
+        └── <task>.e2e.ts    # Executable browser test script
 ```
+
+### The 8-Artifact Protocol per Task
+* `Description.md`: What the feature does and what business acceptance criteria must pass.
+* `Analyze.md`: Technical breakdown of the DOM, accessibility roles, and flakiness factors.
+* `Plan.md`: Concrete execution strategy (navigation -> interaction -> functional assertion -> visual assertion).
+* `Todo.md`: Task checklist tracking the lifecycle from analysis to verified execution.
+* `Review.md`: Human review sign-off records (`APPROVED` / `CHANGES_REQUESTED`) and test execution verdicts.
+* `TestCase.md`: Formal QA test case specification matching enterprise test management standards.
+* `data.json`: Parameterized inputs kept cleanly decoupled from test code.
+* `*.e2e.ts`: The runnable test executed by the `@e2e-dev/web` engine.
 
 ---
 
 ## 5. Review & Execution Gates
 - **Low-Risk Changes** (updating existing locators, assertion fixes): Can be updated and verified directly.
-- **High-Risk Changes** (new user flows, checkout/payment flows, database-mutating flows): Must require explicit human confirmation during the `/check-new-test` review phase.
+- **High-Risk Changes** (new user flows, checkout/payment flows, database-mutating flows): Must require explicit human confirmation in `Review.md` during the `/check-new-test` review phase before `.e2e.ts` is implemented.
